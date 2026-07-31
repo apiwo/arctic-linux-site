@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>arctic — the frozen situation</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav class="topbar">
+  <a href="https://ports-arctic.apiwow.net">ports/</a> |
+  <a href="https://pkg-arctic.apiwow.net">pkg</a> |
+  <a href="https://github.com/apiwo/arctic-linux">source</a> |
+</nav>
+
+<div class="wrap">
+
+  <header class="hero">
+    <h1>arctic</h1>
+    <span class="tagline">a bsd userland, built on glibc</span>
+  </header>
+
+  <div class="top-grid">
+    <div class="pages">
+      <p>pages:</p>
+      <ul>
+        <li><a href="https://ports-arctic.apiwow.net">ports/</a></li>
+        <li><a href="https://pkg-arctic.apiwow.net">pkg</a></li>
+        <li><a href="https://github.com/apiwo/arctic-linux">source</a></li>
+      </ul>
+    </div>
+    <div class="art">
+<pre>                   .xx
+                   xxxx
+                  xxxxxx
+                 xxxxxxx
+                xxxxxxxxx
+               .xx ;xxxxxx
+               xx   xxxxxxx
+              xx+    xxxxxx+
+             xxx      xxxxxx
+            xxx        xxxxxx
+           .xx         ;xxxxxx
+           xx           xxxxxxx
+          xx+            xxxxxx;
+         xxxxxxxxxxxxxxxxxxxxxxx
+        xxx                xxxxxx
+       .xx                 +xxxxxx
+       xx                   xxxxxxx
+      xx+                    xxxxxx:
+     xxx                      xxxxxx
+    xxxx                      xxxxxxx
+ xxxxxxxxx;:              :xxxxxxxxxxxxx:</pre>
+    </div>
+  </div>
+
+  <section>
+    <p><em>arctic</em> is a linux distribution built from source, pairing a
+    BSD userland (toybox, zsh, doas, netbsd-curses, bmake) with glibc and an
+    LLVM toolchain underneath. busybox handles init. packages install through
+    <a href="https://pkg-arctic.apiwow.net">alpm</a>, its own package manager, with per-file
+    verification and one-command rollback built in. <strong>a musl libc port
+    is currently underway</strong> as an alternative base.</p>
+  </section>
+
+  <section>
+    <h2>features</h2>
+    <ul>
+      <li>toybox userland in place of GNU coreutils, zsh as the login shell</li>
+      <li>clang, lld, and libc++ — glibc is kept only where the NVIDIA driver requires it</li>
+      <li>doas instead of sudo, netbsd-curses instead of ncurses</li>
+      <li>alpm: rollback, -nomod staging, per-file sha256 verification, alt-nonfree counterparts for every proprietary package</li>
+      <li>NVIDIA, AMD, and Intel drivers coexisting through libglvnd</li>
+      <li>boots to a TTY — no display manager, no desktop, install one afterwards with alpm</li>
+    </ul>
+  </section>
+
+  <section>
+    <p class="status-line"><strong>STATUS:</strong> arctic-minimal boots and
+    installs end to end — Limine → kernel → initramfs → busybox init → zsh,
+    with alpm installing from the repository carried on the medium. no
+    desktop image exists yet, by design.</p>
+  </section>
+
+  <section>
+    <h2>install</h2>
+    <pre class="code"><span class="c"># wired is automatic, for wireless:</span>
+iwctl station wlan0 connect YOUR-NETWORK
+
+mount /dev/nvme0n1p1 /mnt
+
+<span class="c"># arctic-conf asks the questions and writes an answer file</span>
+<span class="c"># arctic-strap installs from it, non-interactively</span>
+arctic-conf /mnt
+arctic-strap /mnt
+
+mount /dev/nvme0n1p2 /mnt/boot
+arctic-boot-conf /mnt/boot
+arctic-boot-strap /mnt/boot --efi
+
+reboot</pre>
+  </section>
+
+  <section>
+    <h2>build it yourself</h2>
+    <p>every build runs sandboxed under bubblewrap — the host is mounted
+    read-only, only the build tree and /tmp are writable. that is not a
+    formality: a recipe that forgets DESTDIR once installed glibc straight
+    over a host's /usr/lib. it now just fails with EROFS instead.</p>
+    <pre class="code">build/arctic-sandbox --check
+build/build.sh</pre>
+  </section>
+
+  <section>
+    <h2>contribute</h2>
+    <p>502 packages are defined in <a href="https://github.com/apiwo/arctic-linux/blob/main/ports/manifest.tsv">ports/manifest.tsv</a>, with
+    recipes generated from it rather than hand-written. adding a port means
+    adding a line to the manifest, not boilerplate.</p>
+    <p>pull requests welcome on <a href="https://github.com/apiwo/arctic-linux">github</a>.</p>
+  </section>
+
+  <footer>
+    arctic's own code is BSD-2-Clause. packaged software keeps its own licence.
+  </footer>
+
+</div>
+</body>
+</html>
