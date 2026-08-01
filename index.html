@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>arctic — the frozen situation</title>
+<title>arctic linux</title>
 <style>
   :root{
     --bg:#0a1c38;
@@ -117,6 +117,20 @@
   }
   .status-line strong{color:var(--fg);}
 
+  table.libc-compare{
+    width:100%;
+    border-collapse:collapse;
+    font-size:14px;
+    margin:4px 0 6px;
+  }
+  table.libc-compare th, table.libc-compare td{
+    text-align:left;
+    padding:6px 10px 6px 0;
+    border-bottom:1px solid var(--rule);
+  }
+  table.libc-compare th{color:var(--fg-dim);font-weight:600;}
+  table.libc-compare code{color:var(--accent);}
+
   pre.code{
     background:var(--bg-alt);
     border:1px solid var(--rule);
@@ -141,6 +155,7 @@
     .top-grid{flex-direction:column;}
     .art{justify-content:flex-start;}
     .art pre{font-size:11px;}
+    table.libc-compare{font-size:13px;}
   }
 </style>
 </head>
@@ -156,14 +171,12 @@
 <div class="wrap">
 
   <header class="hero">
-    <h1>arctic</h1>
-    <span class="tagline">a bsd userland, built on glibc</span>
+    <h1>Arctic linux</h1>
+    <span class="tagline">Experimental distrobution with a non-declarative and declarative system</span>
   </header>
 
   <div class="top-grid">
- 
-      
-    </div>
+
     <div class="art">
 <pre>                   .xx
                    xxxx
@@ -190,32 +203,57 @@
   </div>
 
   <section>
-    <p><em>arctic</em> is a linux distribution built from source, pairing a
+    <p><em>Arctic</em> is a linux distribution built from source, pairing a
     BSD userland (toybox, zsh, doas, netbsd-curses, bmake) with glibc
     underneath. busybox handles init. packages install through
     <a href="https://pkg-arctic.apiwow.net">alpm</a>, its own package manager, with per-file
     verification and one-command rollback built in. installed declaratively:
-    edit a config file, run one command. <strong>a musl port exists
-    alongside glibc</strong> too — see the <a href="https://arctic-docs.apiwow.net">docs</a>.</p>
+    edit a config file, run one command. <strong>a musl libc build exists
+    alongside the glibc build</strong> — same userland, same alpm, smaller
+    static binaries and no dynamic linker gymnastics. pick one at install
+    time. see the <a href="https://arctic-docs.apiwow.net">docs</a> for the
+    tradeoffs.</p>
   </section>
 
   <section>
-    <h2>features</h2>c
+    <h2>features</h2>
     <ul>
       <li>toybox userland in place of GNU coreutils, zsh as the login shell</li>
       <li>declarative install and system management — <code>arctic-strap</code>, <code>arctic-rebuild</code>, no menus</li>
       <li>doas instead of sudo, netbsd-curses instead of ncurses</li>
       <li>alpm: rollback, -nomod staging, per-file sha256 verification, alt-nonfree counterparts for every proprietary package</li>
       <li>NVIDIA, AMD, and Intel drivers coexisting through libglvnd</li>
+      <li>glibc and musl builds, both drawing from the same 500+ package manifest</li>
       <li>boots to a TTY — no display manager, no desktop, install one afterwards with alpm</li>
     </ul>
   </section>
 
   <section>
+    <h2>glibc vs musl</h2>
+    <p>both builds run the same toybox/zsh/alpm userland and are driven by
+    the same manifest in <a href="https://github.com/apiwo/arctic-linux-ports">arctic-linux-ports</a> —
+    switching libc doesn't mean switching distros.</p>
+    <table class="libc-compare">
+      <tr><th></th><th>glibc</th><th>musl</th></tr>
+      <tr><td>binary size</td><td>larger, dynamic by default</td><td>smaller, static-friendly</td></tr>
+      <tr><td>compat</td><td>widest package/proprietary-blob compat</td><td>a few packages need patching or aren't ported yet</td></tr>
+      <tr><td>NSS / DNS</td><td>full NSS, glibc resolver</td><td>musl's own minimal resolver, no NSS plugins</td></tr>
+      <tr><td>use case</td><td>daily driver, NVIDIA/proprietary-heavy</td><td>containers, minimal installs, static toolchains</td></tr>
+    </table>
+    <p>install with <code>A_LIBC=musl</code> in <code>install.conf</code>, or
+    leave it unset/<code>glibc</code> for the default. alpm resolves the
+    right package variant automatically based on which build you're on.</p>
+  </section>
+
+  <section>
     <p class="status-line"><strong>STATUS:</strong> arctic-minimal boots and
-    installs end to end — Limine → kernel → initramfs → busybox init → zsh,
-    with alpm installing from the repository carried on the medium. no
-    desktop image exists yet, by design.</p>
+    installs end to end on glibc — Limine → kernel → initramfs → busybox init
+    → zsh, with alpm installing from the repository carried on the medium.
+    the musl build boots too but has a smaller slice of the package manifest
+    ported so far. no desktop image exists yet on either libc, by design.
+    the fully declarative install/rebuild flow is still in testing and has
+    known bugs — core install works, but expect rough edges until it's
+    ironed out.</p>
   </section>
 
   <section>
@@ -223,7 +261,8 @@
     <pre class="code"><span class="c"># wired is automatic, for wireless:</span>
 iwctl station wlan0 connect YOUR-NETWORK
 
-<span class="c"># edit the config, then one command does everything</span>
+<span class="c"># edit the config, then one command does everything
+# set A_LIBC=musl for the musl build, or leave it as glibc</span>
 vi /etc/arctic/install.conf
 arctic-strap</pre>
     <p>set <code>A_DISK=/dev/sdX</code> in the config and that one command
@@ -237,9 +276,11 @@ arctic-strap</pre>
     <p>every build runs sandboxed under bubblewrap — the host is mounted
     read-only, only the build tree and /tmp are writable. that is not a
     formality: a recipe that forgets DESTDIR once installed glibc straight
-    over a host's /usr/lib. it now just fails with EROFS instead.</p>
+    over a host's /usr/lib. it now just fails with EROFS instead. pass
+    <code>--libc=musl</code> to build the musl variant instead of the
+    glibc default.</p>
     <pre class="code">build/arctic-sandbox --check
-build/build.sh</pre>
+build/build.sh <span class="c"># or: build/build.sh --libc=musl</span></pre>
   </section>
 
   <section>
@@ -247,7 +288,10 @@ build/build.sh</pre>
     <p>500+ packages are defined in a manifest in
     <a href="https://github.com/apiwo/arctic-linux-ports">arctic-linux-ports</a>, with
     recipes generated from it rather than hand-written. adding a port means
-    adding a line to the manifest, not boilerplate.</p>
+    adding a line to the manifest, not boilerplate — most recipes build
+    clean on both libc targets with no changes needed. porting a package
+    to musl that only builds on glibc is one of the easiest ways to help
+    right now.</p>
     <p>pull requests welcome on <a href="https://github.com/apiwo/arctic-linux">github</a>.</p>
   </section>
 
