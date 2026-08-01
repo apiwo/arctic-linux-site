@@ -172,7 +172,7 @@
 
   <header class="hero">
     <h1>Arctic linux</h1>
-    <span class="tagline">Experimental distrobution with a non-declarative and declarative system</span>
+    <span class="tagline">A source-built Linux distribution, managed declaratively, with generations you can roll back to</span>
   </header>
 
   <div class="top-grid">
@@ -205,26 +205,38 @@
   <section>
     <p><em>Arctic</em> is a linux distribution built from source, pairing a
     BSD userland (toybox, zsh, doas, netbsd-curses, bmake) with glibc
-    underneath. busybox handles init. packages install through
-    <a href="https://pkg-arctic.apiwow.net">alpm</a>, its own package manager, with per-file
-    verification and one-command rollback built in. installed declaratively:
-    edit a config file, run one command. <strong>a musl libc build exists
-    alongside the glibc build</strong> — same userland, same alpm, smaller
-    static binaries and no dynamic linker gymnastics. pick one at install
-    time. see the <a href="https://arctic-docs.apiwow.net">docs</a> for the
-    tradeoffs.</p>
+    underneath. packages install through
+    <a href="https://pkg-arctic.apiwow.net">alpm</a>, its own package manager,
+    with per-file verification and rollback built in.</p>
+
+    <p>the machine is described in a file, and one command makes the machine
+    match it. every rebuild records a <strong>generation</strong> — the
+    packages, services and config as they were — so a bad edit is one
+    <code>arctic rollback</code> away, or one entry in the boot menu if the
+    result will not boot. the same idea as NixOS, built on an ordinary
+    package manager rather than replacing it.</p>
+
+    <p>the kernel is <a href="https://github.com/apiwo/arctic-kernel">its own
+    fork</a> of Linux LTS with the ZEN patchset on top. init is your choice —
+    busybox, OpenRC, sysvinit, runit, dinit, s6, systemd — and services are
+    declared once and translated to whichever one runs. <strong>musl exists
+    alongside glibc</strong> as an opt-in second libc. see the
+    <a href="https://arctic-docs.apiwow.net">docs</a>.</p>
   </section>
 
   <section>
     <h2>features</h2>
     <ul>
-      <li>toybox userland in place of GNU coreutils, zsh as the login shell</li>
-      <li>declarative install and system management — <code>arctic-strap</code>, <code>arctic-rebuild</code>, no menus</li>
-      <li>doas instead of sudo, netbsd-curses instead of ncurses</li>
+      <li>declarative: one config file describes the machine, <code>arctic-rebuild</code> makes it so — no menus anywhere</li>
+      <li>generations: every rebuild is recorded and undoable, from the shell or the boot menu</li>
+      <li><a href="https://github.com/apiwo/arctic-kernel">Arctic-kernel</a> — Linux 6.12 LTS + ZEN (PDS/BMQ, ACS override, ntsync, vhba), alongside five other kernel choices</li>
+      <li>pick your init: busybox, OpenRC, sysvinit, runit, dinit, s6-66, systemd — services declared once, translated to each</li>
+      <li>toybox userland in place of GNU coreutils, zsh as the login shell, doas instead of sudo, netbsd-curses instead of ncurses</li>
       <li>alpm: rollback, -nomod staging, per-file sha256 verification, alt-nonfree counterparts for every proprietary package</li>
+      <li>desktop profiles — XFCE, KDE, Niri, dwm — and a sound profile that installs the whole PipeWire stack working</li>
+      <li>btrfs subvolumes and snapshots, LUKS2 encryption, install onto a whole disk or partitions you made yourself</li>
       <li>NVIDIA, AMD, and Intel drivers coexisting through libglvnd</li>
-      <li>glibc and musl builds, both drawing from the same 500+ package manifest</li>
-      <li>boots to a TTY — no display manager, no desktop, install one afterwards with alpm</li>
+      <li>glibc with musl available alongside it, both from the same 530+ package manifest</li>
     </ul>
   </section>
 
@@ -240,20 +252,23 @@
       <tr><td>NSS / DNS</td><td>full NSS, glibc resolver</td><td>musl's own minimal resolver, no NSS plugins</td></tr>
       <tr><td>use case</td><td>daily driver, NVIDIA/proprietary-heavy</td><td>containers, minimal installs, static toolchains</td></tr>
     </table>
-    <p>install with <code>A_LIBC=musl</code> in <code>install.conf</code>, or
-    leave it unset/<code>glibc</code> for the default. alpm resolves the
-    right package variant automatically based on which build you're on.</p>
+    <p>musl installs alongside glibc rather than instead of it —
+    <code>alpm ins musl</code> puts it at <code>/usr/musl</code> and glibc
+    stays what the base system is built against. binary packages are glibc;
+    on musl you build from source with <code>alpm ins -s</code>.</p>
   </section>
 
   <section>
-    <p class="status-line"><strong>STATUS:</strong> arctic-minimal boots and
-    installs end to end on glibc — Limine → kernel → initramfs → busybox init
-    → zsh, with alpm installing from the repository carried on the medium.
-    the musl build boots too but has a smaller slice of the package manifest
-    ported so far. no desktop image exists yet on either libc, by design.
-    the fully declarative install/rebuild flow is still in testing and has
-    known bugs — core install works, but expect rough edges until it's
-    ironed out.</p>
+    <p class="status-line"><strong>STATUS:</strong> the base image boots and
+    installs end to end — Limine → kernel → initramfs → init → zsh, with alpm
+    installing from the repository carried on the medium. the declarative
+    layer (system.conf, arctic-rebuild, generations, rollback) works and is
+    tested, though system.conf currently covers packages and services rather
+    than hostname/locale/users. init systems other than busybox generate
+    correct service definitions but have had much less real use — use the
+    default for a first install. musl is real but young: musl itself and a
+    handful of packages build against it. no desktop ISO exists, by design;
+    desktops install afterwards from a profile.</p>
   </section>
 
   <section>
@@ -261,13 +276,16 @@
     <pre class="code"><span class="c"># wired is automatic, for wireless:</span>
 iwctl station wlan0 connect YOUR-NETWORK
 
-<span class="c"># edit the config, then one command does everything
-# set A_LIBC=musl for the musl build, or leave it as glibc</span>
-vi /etc/arctic/install.conf
+<span class="c"># edit the config, then one command does everything</span>
+nano /etc/arctic/install.conf
 arctic-strap</pre>
-    <p>set <code>A_DISK=/dev/sdX</code> in the config and that one command
-    partitions, formats, mounts, installs, and wires up the bootloader.
-    leave it commented out for the manual mount-it-yourself path instead.
+    <p>set <code>A_DISK=/dev/sdX</code> and that one command partitions,
+    formats, mounts, installs and wires up the bootloader. or set
+    <code>A_ROOT_PART</code>/<code>A_BOOT_PART</code> to use partitions you
+    made yourself, formatted or not. the config is checked before anything is
+    written — it either says <code>Config file accepted</code> with a summary,
+    or lists everything that is wrong and stops having changed nothing.
+    <code>arctic-strap</code> takes no arguments; the disk is in the config.
     full walkthrough in the <a href="https://arctic-docs.apiwow.net">docs</a>.</p>
   </section>
 
@@ -276,16 +294,17 @@ arctic-strap</pre>
     <p>every build runs sandboxed under bubblewrap — the host is mounted
     read-only, only the build tree and /tmp are writable. that is not a
     formality: a recipe that forgets DESTDIR once installed glibc straight
-    over a host's /usr/lib. it now just fails with EROFS instead. pass
-    <code>--libc=musl</code> to build the musl variant instead of the
-    glibc default.</p>
+    over a host's /usr/lib. it now just fails with EROFS instead.</p>
     <pre class="code">build/arctic-sandbox --check
-build/build.sh <span class="c"># or: build/build.sh --libc=musl</span></pre>
+build/build.sh</pre>
+    <p>musl packages build through <code>build/arctic-musl-sandbox</code>,
+    which adds a real musl toolchain at <code>/usr/musl</code> inside the
+    same read-only sandbox.</p>
   </section>
 
   <section>
     <h2>contribute</h2>
-    <p>500+ packages are defined in a manifest in
+    <p>530+ packages are defined in a manifest in
     <a href="https://github.com/apiwo/arctic-linux-ports">arctic-linux-ports</a>, with
     recipes generated from it rather than hand-written. adding a port means
     adding a line to the manifest, not boilerplate — most recipes build
