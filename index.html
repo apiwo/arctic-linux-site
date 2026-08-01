@@ -59,6 +59,18 @@
     color:var(--fg-dim);
     font-size:18px;
   }
+  .btn{
+    display:inline-block;
+    margin-left:auto;
+    padding:8px 18px;
+    border:1px solid var(--accent-dim);
+    border-radius:4px;
+    color:var(--fg);
+    text-decoration:none;
+    font-size:14px;
+    letter-spacing:.02em;
+  }
+  .btn:hover{border-color:var(--accent);color:var(--accent);}
 
   .top-grid{
     display:flex;
@@ -135,6 +147,7 @@
 <body>
 
 <nav class="topbar">
+  <a href="https://arctic-docs.apiwow.net">docs</a> |
   <a href="https://ports-arctic.apiwow.net">ports/</a> |
   <a href="https://pkg-arctic.apiwow.net">pkg</a> |
   <a href="https://github.com/apiwo/arctic-linux">source</a> |
@@ -145,12 +158,14 @@
   <header class="hero">
     <h1>arctic</h1>
     <span class="tagline">a bsd userland, built on glibc</span>
+    <a class="btn" href="https://arctic-docs.apiwow.net">docs</a>
   </header>
 
   <div class="top-grid">
     <div class="pages">
       <p>pages:</p>
       <ul>
+        <li><a href="https://arctic-docs.apiwow.net">docs</a></li>
         <li><a href="https://ports-arctic.apiwow.net">ports/</a></li>
         <li><a href="https://pkg-arctic.apiwow.net">pkg</a></li>
         <li><a href="https://github.com/apiwo/arctic-linux">source</a></li>
@@ -183,18 +198,19 @@
 
   <section>
     <p><em>arctic</em> is a linux distribution built from source, pairing a
-    BSD userland (toybox, zsh, doas, netbsd-curses, bmake) with glibc and an
-    LLVM toolchain underneath. busybox handles init. packages install through
+    BSD userland (toybox, zsh, doas, netbsd-curses, bmake) with glibc
+    underneath. busybox handles init. packages install through
     <a href="https://pkg-arctic.apiwow.net">alpm</a>, its own package manager, with per-file
-    verification and one-command rollback built in. <strong>a musl libc port
-    is currently underway</strong> as an alternative base.</p>
+    verification and one-command rollback built in. installed declaratively:
+    edit a config file, run one command. <strong>a musl port exists
+    alongside glibc</strong> too — see the <a href="https://arctic-docs.apiwow.net">docs</a>.</p>
   </section>
 
   <section>
     <h2>features</h2>
     <ul>
       <li>toybox userland in place of GNU coreutils, zsh as the login shell</li>
-      <li>clang, lld, and libc++ — glibc is kept only where the NVIDIA driver requires it</li>
+      <li>declarative install and system management — <code>arctic-strap</code>, <code>arctic-rebuild</code>, no menus</li>
       <li>doas instead of sudo, netbsd-curses instead of ncurses</li>
       <li>alpm: rollback, -nomod staging, per-file sha256 verification, alt-nonfree counterparts for every proprietary package</li>
       <li>NVIDIA, AMD, and Intel drivers coexisting through libglvnd</li>
@@ -214,18 +230,13 @@
     <pre class="code"><span class="c"># wired is automatic, for wireless:</span>
 iwctl station wlan0 connect YOUR-NETWORK
 
-mount /dev/nvme0n1p1 /mnt
-
-<span class="c"># arctic-conf asks the questions and writes an answer file</span>
-<span class="c"># arctic-strap installs from it, non-interactively</span>
-arctic-conf /mnt
-arctic-strap /mnt
-
-mount /dev/nvme0n1p2 /mnt/boot
-arctic-boot-conf /mnt/boot
-arctic-boot-strap /mnt/boot --efi
-
-reboot</pre>
+<span class="c"># edit the config, then one command does everything</span>
+vi /etc/arctic/install.conf
+arctic-strap</pre>
+    <p>set <code>A_DISK=/dev/sdX</code> in the config and that one command
+    partitions, formats, mounts, installs, and wires up the bootloader.
+    leave it commented out for the manual mount-it-yourself path instead.
+    full walkthrough in the <a href="https://arctic-docs.apiwow.net">docs</a>.</p>
   </section>
 
   <section>
@@ -240,7 +251,8 @@ build/build.sh</pre>
 
   <section>
     <h2>contribute</h2>
-    <p>502 packages are defined in <a href="https://github.com/apiwo/arctic-linux/blob/main/ports/manifest.tsv">ports/manifest.tsv</a>, with
+    <p>500+ packages are defined in a manifest in
+    <a href="https://github.com/apiwo/arctic-linux-ports">arctic-linux-ports</a>, with
     recipes generated from it rather than hand-written. adding a port means
     adding a line to the manifest, not boilerplate.</p>
     <p>pull requests welcome on <a href="https://github.com/apiwo/arctic-linux">github</a>.</p>
