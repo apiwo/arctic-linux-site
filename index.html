@@ -72,6 +72,40 @@
   }
   .btn:hover{border-color:var(--accent);color:var(--accent);}
 
+  .download{
+    display:flex;
+    align-items:center;
+    gap:20px;
+    flex-wrap:wrap;
+    margin:8px 0 4px;
+    padding:18px 20px;
+    border:1px solid var(--accent-dim);
+    border-radius:6px;
+  }
+  .btn-download{
+    display:inline-block;
+    padding:12px 26px;
+    border:1px solid var(--accent);
+    border-radius:4px;
+    background:var(--accent);
+    color:var(--bg);
+    text-decoration:none;
+    font-size:16px;
+    letter-spacing:.02em;
+    white-space:nowrap;
+  }
+  .btn-download:hover{background:transparent;color:var(--accent);}
+  .download .meta{
+    font-size:13px;
+    color:var(--fg-dim);
+    line-height:1.7;
+    min-width:0;
+  }
+  .download .meta code{
+    font-size:12px;
+    overflow-wrap:anywhere;
+  }
+
   .top-grid{
     display:flex;
     gap:32px;
@@ -164,7 +198,7 @@
 <nav class="topbar">
   <a href="https://arctic-docs.apiwow.net">docs</a> |
   <a href="https://ports-arctic.apiwow.net">ports/</a> |
-  <a href="https://pkg-arctic.apiwow.net">pkg</a> |
+  <a href="https://github.com/apiwo/arctic-linux-pkgs">pkg</a> |
   <a href="https://github.com/apiwo/arctic-linux">source</a> |
 </nav>
 
@@ -174,6 +208,16 @@
     <h1>Arctic linux</h1>
     <span class="tagline">A source-built Linux distribution, managed declaratively, with generations you can roll back to</span>
   </header>
+
+  <div class="download">
+    <a class="btn-download"
+       href="https://github.com/apiwo/arctic-linux/releases/download/a1.1/Arctic-linux-a1.1.iso">Download Arctic Linux</a>
+    <div class="meta">
+      Alpha 1.1 &middot; x86_64 &middot; 382 MiB &middot; live image and installer<br>
+      sha256 <code>89735185b8d203fbafbb7d90ddf6edc84b1f62f174959f6121a0502ac2c917d3</code><br>
+      Write it to a USB stick with <code>dd</code> and boot it &mdash; it is a hybrid image, no tool needed.
+    </div>
+  </div>
 
   <div class="top-grid">
 
@@ -206,8 +250,10 @@
     <p><em>Arctic</em> is a linux distribution built from source, pairing a
     BSD userland (toybox, zsh, doas, netbsd-curses, bmake) with glibc
     underneath. packages install through
-    <a href="https://pkg-arctic.apiwow.net">alpm</a>, its own package manager,
-    with per-file verification and rollback built in.</p>
+    <a href="https://github.com/apiwo/arctic-linux-pkgs">alpm</a>, its own package manager,
+    with per-file verification and rollback built in. every repository index
+    is signed with signify, and the key that checks it ships in the base
+    system rather than arriving beside the thing it verifies.</p>
 
     <p>the machine is described in a file, and one command makes the machine
     match it. every rebuild records a <strong>generation</strong> — the
@@ -218,9 +264,9 @@
 
     <p>the kernel is <a href="https://github.com/apiwo/arctic-kernel">its own
     fork</a> of Linux LTS with the ZEN patchset on top. init is your choice —
-    busybox, OpenRC, sysvinit, runit, dinit, s6, systemd — and services are
-    declared once and translated to whichever one runs. <strong>musl exists
-    alongside glibc</strong> as an opt-in second libc. see the
+    <a href="https://github.com/apiwo/initialization">initialization</a>,
+    OpenRC, sysvinit, runit, dinit — and services are declared once and
+    translated to whichever one runs. see the
     <a href="https://arctic-docs.apiwow.net">docs</a>.</p>
   </section>
 
@@ -230,45 +276,28 @@
       <li>declarative: one config file describes the machine, <code>arctic-rebuild</code> makes it so — no menus anywhere</li>
       <li>generations: every rebuild is recorded and undoable, from the shell or the boot menu</li>
       <li><a href="https://github.com/apiwo/arctic-kernel">Arctic-kernel</a> — Linux 6.12 LTS + ZEN (PDS/BMQ, ACS override, ntsync, vhba), alongside five other kernel choices</li>
-      <li>pick your init: busybox, OpenRC, sysvinit, runit, dinit, s6-66, systemd — services declared once, translated to each</li>
+      <li>pick your init: <a href="https://github.com/apiwo/initialization">initialization</a>, OpenRC, sysvinit, runit, dinit — services declared once, translated to each</li>
       <li>toybox userland in place of GNU coreutils, zsh as the login shell, doas instead of sudo, netbsd-curses instead of ncurses</li>
       <li>alpm: rollback, -nomod staging, per-file sha256 verification, alt-nonfree counterparts for every proprietary package</li>
       <li>desktop profiles — XFCE, KDE, Niri, dwm — and a sound profile that installs the whole PipeWire stack working</li>
       <li>btrfs subvolumes and snapshots, LUKS2 encryption, install onto a whole disk or partitions you made yourself</li>
       <li>NVIDIA, AMD, and Intel drivers coexisting through libglvnd</li>
-      <li>glibc with musl available alongside it, both from the same 530+ package manifest</li>
+      <li><code>alpm system fix</code> — corrections that no version bump would carry, applied as ordinary binary packages</li>
     </ul>
   </section>
 
   <section>
-    <h2>glibc vs musl</h2>
-    <p>both builds run the same toybox/zsh/alpm userland and are driven by
-    the same manifest in <a href="https://github.com/apiwo/arctic-linux-ports">arctic-linux-ports</a> —
-    switching libc doesn't mean switching distros.</p>
-    <table class="libc-compare">
-      <tr><th></th><th>glibc</th><th>musl</th></tr>
-      <tr><td>binary size</td><td>larger, dynamic by default</td><td>smaller, static-friendly</td></tr>
-      <tr><td>compat</td><td>widest package/proprietary-blob compat</td><td>a few packages need patching or aren't ported yet</td></tr>
-      <tr><td>NSS / DNS</td><td>full NSS, glibc resolver</td><td>musl's own minimal resolver, no NSS plugins</td></tr>
-      <tr><td>use case</td><td>daily driver, NVIDIA/proprietary-heavy</td><td>containers, minimal installs, static toolchains</td></tr>
-    </table>
-    <p>musl installs alongside glibc rather than instead of it —
-    <code>alpm ins musl</code> puts it at <code>/usr/musl</code> and glibc
-    stays what the base system is built against. binary packages are glibc;
-    on musl you build from source with <code>alpm ins -s</code>.</p>
-  </section>
-
-  <section>
-    <p class="status-line"><strong>STATUS:</strong> the base image boots and
-    installs end to end — Limine → kernel → initramfs → init → zsh, with alpm
-    installing from the repository carried on the medium. the declarative
-    layer (system.conf, arctic-rebuild, generations, rollback) works and is
-    tested, though system.conf currently covers packages and services rather
-    than hostname/locale/users. init systems other than busybox generate
+    <p class="status-line"><strong>STATUS:</strong> alpha. the image boots and
+    installs end to end — Limine → kernel → initramfs → init → zsh — fetching
+    packages from the online repositories rather than carrying them on the
+    medium, so an install is current the day you run it rather than the day
+    the image was built. the declarative layer (system.conf,
+    <code>arctic-rebuild</code>, generations, rollback) works and is tested,
+    though system.conf currently covers packages and services rather than
+    hostname/locale/users. init systems other than the default generate
     correct service definitions but have had much less real use — use the
-    default for a first install. musl is real but young: musl itself and a
-    handful of packages build against it. no desktop ISO exists, by design;
-    desktops install afterwards from a profile.</p>
+    default for a first install. no desktop ISO exists, by design; desktops
+    install afterwards from a profile.</p>
   </section>
 
   <section>
@@ -297,9 +326,18 @@ arctic-strap</pre>
     over a host's /usr/lib. it now just fails with EROFS instead.</p>
     <pre class="code">build/arctic-sandbox --check
 build/build.sh</pre>
-    <p>musl packages build through <code>build/arctic-musl-sandbox</code>,
-    which adds a real musl toolchain at <code>/usr/musl</code> inside the
-    same read-only sandbox.</p>
+    <p>the toolchain is clang, lld and the llvm-* binutils. there is no
+    second one: a package built by gcc is not an Arctic package, and
+    <code>alpm build</code> refuses to produce one unless it is told, loudly,
+    that you know what you are doing.</p>
+    <p>llvm is a package now, so an installed machine has a compiler of its
+    own and <code>alpm ins -s</code> works on it. at 148 MiB it is far past
+    what a git mirror will hold, so it arrives the same way firmware does —
+    a release asset, indexed by the <code>big</code> repository, installed
+    like anything else.</p>
+    <p>be straight about where this has got to: the packages in the current
+    image were still compiled by gcc. llvm being packaged is what makes the
+    rebuild possible, not the rebuild itself.</p>
   </section>
 
   <section>
@@ -307,9 +345,8 @@ build/build.sh</pre>
     <p>530+ packages are defined in a manifest in
     <a href="https://github.com/apiwo/arctic-linux-ports">arctic-linux-ports</a>, with
     recipes generated from it rather than hand-written. adding a port means
-    adding a line to the manifest, not boilerplate — most recipes build
-    clean on both libc targets with no changes needed. porting a package
-    to musl that only builds on glibc is one of the easiest ways to help
+    adding a line to the manifest, not boilerplate. getting a package that
+    assumes gcc to build under clang is one of the easiest ways to help
     right now.</p>
     <p>pull requests welcome on <a href="https://github.com/apiwo/arctic-linux">github</a>.</p>
   </section>
