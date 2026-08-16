@@ -75,22 +75,22 @@
   .download{
     display:flex;
     align-items:center;
-    gap:20px;
+    gap:16px;
     flex-wrap:wrap;
     margin:8px 0 4px;
-    padding:18px 20px;
+    padding:14px 16px;
     border:1px solid var(--accent-dim);
     border-radius:6px;
   }
   .btn-download{
     display:inline-block;
-    padding:12px 26px;
+    padding:9px 18px;
     border:1px solid var(--accent);
     border-radius:4px;
     background:var(--accent);
     color:var(--bg);
     text-decoration:none;
-    font-size:16px;
+    font-size:14px;
     letter-spacing:.02em;
     white-space:nowrap;
   }
@@ -196,10 +196,12 @@
 <body>
 
 <nav class="topbar">
-  <a href="https://arctic-docs.apiwow.net">docs</a> |
-  <a href="https://ports-arctic.apiwow.net">ports/</a> |
-  <a href="https://github.com/apiwo/arctic-linux-pkgs">pkg</a> |
-  <a href="https://github.com/apiwo/arctic-linux">source</a> |
+  <a href="https://arctic-linux.apiwow.net">main page</a>
+  <a href="https://github.com/apiwo/arctic-linux-pkgs">pkg</a>
+  <a href="https://ports-arctic.apiwow.net">ports</a>
+  <a href="https://arctic-docs.apiwow.net">docs</a>
+  <a href="https://github.com/apiwo/arctic-linux">github</a>
+  <a href="https://codeberg.org/apiwo/arctic-linux">codeberg</a>
 </nav>
 
 <div class="wrap">
@@ -349,6 +351,17 @@ build/build.sh</pre>
     assumes gcc to build under clang is one of the easiest ways to help
     right now.</p>
     <p>pull requests welcome on <a href="https://github.com/apiwo/arctic-linux">github</a>.</p>
+  </section>
+
+  <section>
+    <div class="download">
+      <a class="btn-download"
+         href="https://github.com/apiwo/arctic-linux/releases/download/a1.1/Arctic-linux-a1.1.iso">Download Arctic Linux</a>
+      <div class="meta">
+        Alpha 1.1 &middot; x86_64 &middot; 382 MiB &middot; live image and installer<br>
+        <code>dd if=Arctic-linux-a1.1.iso of=/dev/sdX bs=4M status=progress conv=fsync</code>
+      </div>
+    </div>
   </section>
 
   <footer>
