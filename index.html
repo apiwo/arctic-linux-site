@@ -294,19 +294,21 @@
 
   <section>
     <h2>install</h2>
-    <pre class="code"><span class="c"># wired is automatic, for wireless:</span>
-iwctl station wlan0 connect YOUR-NETWORK
+    <pre class="code"><span class="c"># wired is automatic. for wireless, run this and answer it:</span>
+wifi-connect
 
 <span class="c"># edit the config, then one command does everything</span>
 nano /etc/arctic/install.conf
-arctic-strap</pre>
+arctic-install</pre>
+    <p><code>wifi-connect</code> scans, lists what is in range, asks which
+    network and takes the passphrase with the characters masked.</p>
     <p>set <code>A_DISK=/dev/sdX</code> and that one command partitions,
     formats, mounts, installs and wires up the bootloader. or set
     <code>A_ROOT_PART</code>/<code>A_BOOT_PART</code> to use partitions you
     made yourself, formatted or not. the config is checked before anything is
     written — it either says <code>Config file accepted</code> with a summary,
     or lists everything that is wrong and stops having changed nothing.
-    <code>arctic-strap</code> takes no arguments; the disk is in the config.
+    <code>arctic-install</code> takes no arguments; the disk is in the config.
     full walkthrough in the <a href="https://arctic-docs.apiwow.net">docs</a>.</p>
   </section>
 
