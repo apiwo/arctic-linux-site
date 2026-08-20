@@ -111,17 +111,31 @@ mount --mkdir /dev/sdX1 /mnt/boot</pre>
     OpenRC. Either way <code>alpm</code> arrives pre-installed.</p>
     <pre class="code">tar -xJf arctic-linux-def-tarball.tar.xz -C /mnt</pre>
 
-    <h3>3. Bootstrap alpm and fstab</h3>
-    <p><code>alpm-strap</code> syncs fresh repo indexes into the tree.
-    <code>genfstab</code> has to run before chroot, from outside it.</p>
-    <pre class="code">/mnt/usr/bin/alpm-strap /mnt
-ALPM_ROOT=/mnt ALPM_CONF=/mnt/etc/alpm/alpm.conf ALPM_REPOD=/mnt/etc/alpm/repos.d \
+    <h3>3. Sync the package repos</h3>
+    <p><code>alpm-strap</code> runs <code>alpm fetch all</code> against
+    the tarball's own copy of <code>alpm</code>, writing fresh repo
+    indexes into <code>/mnt/var/lib/alpm/sync</code> - the same thing
+    a normal install does the first time it fetches anything, just
+    pointed at <code>/mnt</code> from outside it instead of at
+    <code>/</code> from inside. Nothing installs yet; this only makes
+    package names resolvable.</p>
+    <pre class="code">/mnt/usr/bin/alpm-strap /mnt</pre>
+
+    <h3>4. Write fstab</h3>
+    <p>Has to run now, before chroot: it reads the live environment's
+    own mount table, which a chroot has no view of. genfstab isn't
+    bundled in the tarball, so fetch it explicitly first, still
+    pointed at <code>/mnt</code>.</p>
+    <pre class="code">ALPM_ROOT=/mnt ALPM_CONF=/mnt/etc/alpm/alpm.conf ALPM_REPOD=/mnt/etc/alpm/repos.d \
   /mnt/usr/bin/alpm add genfstab
 /mnt/usr/bin/genfstab /mnt >> /mnt/etc/fstab</pre>
 
-    <h3>4. Chroot in and install the rest</h3>
+    <h3>5. Chroot in and install the rest</h3>
     <p>Swap <code>limine</code> for <code>grub</code> on BIOS if you
-    want GRUB instead.</p>
+    want GRUB instead. <code>arctic-rebuild</code>, run here rather than
+    after exiting, activates the kernel and writes the bootloader
+    config - it reads plain <code>/etc/fstab</code> and <code>/boot</code>,
+    so it only means anything from inside the target.</p>
     <pre class="code">/mnt/usr/bin/arctic-chroot /mnt</pre>
     <pre class="code">passwd
 adduser you
@@ -129,23 +143,26 @@ alpm add arctic-base
 alpm add arctic-base-kernel
 alpm add limine
 arctic-mkinitramfs
+arctic-rebuild
 exit</pre>
 
-    <h3>5. Finish and deploy the bootloader</h3>
-    <p>Back on the live environment, as root. This writes the bootloader
-    config; the actual deploy command stays manual.</p>
-    <pre class="code">arctic-rebuild</pre>
+    <h3>6. Deploy the bootloader</h3>
+    <p>Back on the live environment, as root. The config is already
+    written; this is the one step that stays manual.</p>
     <pre class="code"><span class="c"># BIOS, Limine</span>
 limine bios-install /dev/sdX
 
-<span class="c"># EFI, Limine</span>
+<span class="c"># EFI, Limine - the target's own copy, not the live environment's</span>
+mkdir -p /mnt/boot/EFI/BOOT /mnt/boot/EFI/arctic
+cp /mnt/usr/share/limine/BOOTX64.EFI /mnt/boot/EFI/BOOT/
+cp /mnt/usr/share/limine/BOOTX64.EFI /mnt/boot/EFI/arctic/arcticx64.efi
 efibootmgr --create --disk /dev/sdX --part 1 \
   --loader '\EFI\arctic\arcticx64.efi' --label 'Arctic linux'
 
 <span class="c"># BIOS, GRUB</span>
 grub-install --target=i386-pc --boot-directory=/mnt/boot /dev/sdX</pre>
 
-    <h3>6. Reboot</h3>
+    <h3>7. Reboot</h3>
     <pre class="code">reboot</pre>
 
     <p>Encryption, btrfs, static networking, repairs: the
