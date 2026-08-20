@@ -3,204 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>arctic linux</title>
-<style>
-  :root{
-    --bg:#0a1c38;
-    --bg-alt:#0d2242;
-    --fg:#eef2f8;
-    --fg-dim:#a9bbd6;
-    --accent:#8fb8ff;
-    --accent-dim:#5580b8;
-    --rule:rgba(255,255,255,0.16);
-  }
-  *{box-sizing:border-box;}
-  html{background:var(--bg);}
-  body{
-    margin:0;
-    min-height:100vh;
-    background:var(--bg);
-    color:var(--fg);
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
-    font-size:16px;
-    line-height:1.5;
-  }
-  a{color:var(--accent);text-decoration:underline;}
-  a:hover{color:#c3dbff;}
-  a:focus-visible, button:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
-
-  .wrap{max-width:960px;margin:0 auto;padding:0 24px 80px;}
-
-  nav.topbar{
-    padding:14px 24px;
-    border-bottom:1px solid var(--rule);
-    font-size:14px;
-  }
-  nav.topbar a{margin-right:6px;}
-
-  header.hero{
-    display:flex;
-    align-items:baseline;
-    gap:16px;
-    flex-wrap:wrap;
-    padding:36px 0 8px;
-  }
-  header.hero h1{
-    font-family:Georgia,"Times New Roman",serif;
-    font-style:italic;
-    font-weight:700;
-    font-size:52px;
-    margin:0;
-    color:var(--fg);
-  }
-  header.hero .tagline{
-    font-family:Georgia,"Times New Roman",serif;
-    font-style:italic;
-    color:var(--fg-dim);
-    font-size:18px;
-  }
-  .btn{
-    display:inline-block;
-    margin-left:auto;
-    padding:8px 18px;
-    border:1px solid var(--accent-dim);
-    border-radius:4px;
-    color:var(--fg);
-    text-decoration:none;
-    font-size:14px;
-    letter-spacing:.02em;
-  }
-  .btn:hover{border-color:var(--accent);color:var(--accent);}
-
-  .download{
-    display:flex;
-    align-items:center;
-    gap:16px;
-    flex-wrap:wrap;
-    margin:8px 0 4px;
-    padding:14px 16px;
-    border:1px solid var(--accent-dim);
-    border-radius:6px;
-  }
-  .btn-download{
-    display:inline-block;
-    padding:9px 18px;
-    border:1px solid var(--accent);
-    border-radius:4px;
-    background:var(--accent);
-    color:var(--bg);
-    text-decoration:none;
-    font-size:14px;
-    letter-spacing:.02em;
-    white-space:nowrap;
-  }
-  .btn-download:hover{background:transparent;color:var(--accent);}
-  .download .meta{
-    font-size:13px;
-    color:var(--fg-dim);
-    line-height:1.7;
-    min-width:0;
-  }
-  .download .meta code{
-    font-size:12px;
-    overflow-wrap:anywhere;
-  }
-
-  .top-grid{
-    display:flex;
-    gap:32px;
-    padding:24px 0 8px;
-    flex-wrap:wrap;
-  }
-  .pages{min-width:150px;font-size:15px;}
-  .pages p{margin:0 0 8px;color:var(--fg-dim);}
-  .pages ul{list-style:none;margin:0;padding:0;}
-  .pages li{margin:4px 0;}
-  .pages li::before{content:"› ";color:var(--accent-dim);}
-
-  .art{
-    flex:1;
-    min-width:280px;
-    display:flex;
-    justify-content:center;
-  }
-  .art pre{
-    font-family:"JetBrains Mono","Fira Code",ui-monospace,Menlo,Consolas,monospace;
-    font-size:13px;
-    line-height:1.05;
-    color:var(--accent);
-    margin:0;
-    white-space:pre;
-  }
-
-  section{padding:22px 0;border-top:1px solid var(--rule);}
-  section:first-of-type{border-top:none;}
-  section h2{
-    font-size:17px;
-    margin:0 0 10px;
-    color:var(--fg);
-  }
-  section p{margin:0 0 10px;color:var(--fg);}
-  section ul{margin:0;padding-left:20px;}
-  section li{margin:4px 0;}
-
-  .status-line{
-    font-size:14px;
-    letter-spacing:.02em;
-    color:var(--fg-dim);
-  }
-  .status-line strong{color:var(--fg);}
-
-  table.libc-compare{
-    width:100%;
-    border-collapse:collapse;
-    font-size:14px;
-    margin:4px 0 6px;
-  }
-  table.libc-compare th, table.libc-compare td{
-    text-align:left;
-    padding:6px 10px 6px 0;
-    border-bottom:1px solid var(--rule);
-  }
-  table.libc-compare th{color:var(--fg-dim);font-weight:600;}
-  table.libc-compare code{color:var(--accent);}
-
-  pre.code{
-    background:var(--bg-alt);
-    border:1px solid var(--rule);
-    padding:14px 16px;
-    overflow-x:auto;
-    font-family:"JetBrains Mono","Fira Code",ui-monospace,Menlo,Consolas,monospace;
-    font-size:13px;
-    color:var(--fg);
-    line-height:1.5;
-  }
-  pre.code .c{color:var(--fg-dim);} /* comments */
-
-  footer{
-    padding:24px 0 0;
-    border-top:1px solid var(--rule);
-    font-size:13px;
-    color:var(--fg-dim);
-  }
-
-  @media (max-width:600px){
-    header.hero h1{font-size:40px;}
-    .top-grid{flex-direction:column;}
-    .art{justify-content:flex-start;}
-    .art pre{font-size:11px;}
-    table.libc-compare{font-size:13px;}
-  }
-</style>
+<title>Arctic Linux</title>
+<link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
 
 <nav class="topbar">
-  <a href="https://arctic-linux.apiwow.net">main page</a>
-  <a href="https://pkg-arctic.apiwow.net">pkg</a>
-  <a href="https://ports-arctic.apiwow.net">ports</a>
+  <a href="https://arctic-linux.apiwow.net">main</a>
   <a href="https://arctic-docs.apiwow.net">docs</a>
-  <a href="https://arctic-releases.apiwow.net">releases</a>
+  <a href="https://pkg-arctic.apiwow.net">packages</a>
+  <a href="https://ports-arctic.apiwow.net">ports</a>
   <a href="https://github.com/apiwo/arctic-linux">github</a>
   <a href="https://codeberg.org/apiwo/arctic-linux">codeberg</a>
 </nav>
@@ -208,12 +20,11 @@
 <div class="wrap">
 
   <header class="hero">
-    <h1>Arctic linux</h1>
-    <span class="tagline">A source-built Linux distribution, managed declaratively, with generations you can roll back to</span>
+    <h1>Arctic Linux</h1>
+    <span class="tagline">A source-built Linux distribution, installed by hand, managed declaratively.</span>
   </header>
 
   <div class="top-grid">
-
     <div class="art">
 <pre>                   .xx
                    xxxx
@@ -240,125 +51,136 @@
   </div>
 
   <section>
-    <p><em>Arctic</em> is a linux distribution built from source, pairing a
-    BSD userland (toybox, zsh, doas, netbsd-curses, bmake) with glibc
-    underneath. packages install through
-    <a href="https://pkg-arctic.apiwow.net">alpm</a>, its own package manager,
-    with per-file verification and rollback built in. every repository index
-    is signed with signify, and the key that checks it ships in the base
-    system rather than arriving beside the thing it verifies.</p>
+    <p>Arctic pairs a BSD userland (toybox, zsh, doas, netbsd-curses) with
+    glibc underneath, its own kernel fork, and its own package manager,
+    <code>alpm</code>. Packages are signed with signify; the key ships in
+    the base system rather than arriving beside the thing it verifies.</p>
 
-    <p>the machine is described in a file, and one command makes the machine
-    match it. every rebuild records a <strong>generation</strong> — the
-    packages, services and config as they were — so a bad edit is one
-    <code>arctic rollback</code> away, or one entry in the boot menu if the
-    result will not boot. the same idea as NixOS, built on an ordinary
-    package manager rather than replacing it.</p>
+    <p>There is no installer. You partition, format and chroot by hand,
+    the way Arch or LFS expects - see the install guide below. Once
+    installed, the machine is described in six small files under
+    <code>/etc/arctic/</code>, and one command, <code>arctic-rebuild</code>,
+    makes the machine match them. Every rebuild records a generation, so
+    a bad edit is one <code>arctic rollback</code> away.</p>
 
-    <p>the kernel is <a href="https://github.com/apiwo/arctic-kernel">its own
-    fork</a> of Linux LTS with the ZEN patchset on top. init is your choice —
-    <a href="https://github.com/apiwo/initialization">initialization</a>,
-    OpenRC, sysvinit, runit, dinit — and services are declared once and
-    translated to whichever one runs. see the
-    <a href="https://arctic-docs.apiwow.net">docs</a>.</p>
+    <p>Init is your choice: busybox init (the default) or OpenRC ships
+    ready in its own tarball; sysvinit, runit, dinit and
+    <a href="https://github.com/apiwo/initialization">initialization</a>
+    install afterwards. Services are declared once and translated to
+    whichever one runs.</p>
   </section>
 
   <section>
     <h2>features</h2>
     <ul>
-      <li>declarative: one config file describes the machine, <code>arctic-rebuild</code> makes it so — no menus anywhere</li>
+      <li>manual install, no guided installer - partition, format, chroot, <code>alpm add</code></li>
+      <li>declarative once installed: six files under <code>/etc/arctic/</code>, one <code>arctic-rebuild</code></li>
       <li>generations: every rebuild is recorded and undoable, from the shell or the boot menu</li>
-      <li><a href="https://github.com/apiwo/arctic-kernel">Arctic-kernel</a> — Linux 6.12 LTS + ZEN (PDS/BMQ, ACS override, ntsync, vhba), alongside five other kernel choices</li>
-      <li>pick your init: <a href="https://github.com/apiwo/initialization">initialization</a>, OpenRC, sysvinit, runit, dinit — services declared once, translated to each</li>
-      <li>toybox userland in place of GNU coreutils, zsh as the login shell, doas instead of sudo, netbsd-curses instead of ncurses</li>
-      <li>alpm: rollback, -nomod staging, per-file sha256 verification, alt-nonfree counterparts for every proprietary package</li>
-      <li>desktop profiles — XFCE, KDE, Niri, dwm — and a sound profile that installs the whole PipeWire stack working</li>
-      <li>btrfs subvolumes and snapshots, LUKS2 encryption, install onto a whole disk or partitions you made yourself</li>
-      <li>NVIDIA, AMD, and Intel drivers coexisting through libglvnd</li>
-      <li><code>alpm system fix</code> — corrections that no version bump would carry, applied as ordinary binary packages</li>
+      <li><a href="https://github.com/apiwo/arctic-kernel">Arctic-kernel</a> - Linux LTS + ZEN, alongside five other kernel flavors</li>
+      <li>one networking stack, live and installed alike - no NetworkManager, wifi reconnects in the background at boot</li>
+      <li>toybox userland in place of GNU coreutils, zsh as the login shell, doas instead of sudo</li>
+      <li>alpm: rollback, per-file sha256 verification, source builds, orphan cleanup</li>
+      <li>Limine or GRUB, BIOS and UEFI</li>
+      <li>NVIDIA, AMD and Intel drivers coexisting through libglvnd</li>
     </ul>
   </section>
 
   <section>
-    <p class="status-line"><strong>STATUS:</strong> alpha. the image boots and
-    installs end to end — Limine → kernel → initramfs → init → zsh — fetching
-    packages from the online repositories rather than carrying them on the
-    medium, so an install is current the day you run it rather than the day
-    the image was built. the declarative layer (system.conf,
-    <code>arctic-rebuild</code>, generations, rollback) works and is tested,
-    though system.conf currently covers packages and services rather than
-    hostname/locale/users. init systems other than the default generate
-    correct service definitions but have had much less real use — use the
-    default for a first install. no desktop ISO exists, by design; desktops
-    install afterwards from a profile.</p>
+    <p class="status-line"><strong>STATUS:</strong> alpha. The busybox-init
+    tarball is the tested default. The OpenRC tarball ships alongside it
+    with OpenRC wired up as init, verified separately - use the default
+    for a first install if you are not sure which you want.</p>
   </section>
 
   <section>
     <h2>install</h2>
-    <pre class="code"><span class="c"># wired is automatic. for wireless, run this and answer it:</span>
-wifi-connect
+    <p>Boot any live Linux with <code>tar</code> and disk tools. No
+    Arctic media needed for this part.</p>
 
-<span class="c"># edit the config, then one command does everything</span>
-nano /etc/arctic/install.conf
-arctic-install</pre>
-    <p><code>wifi-connect</code> scans, lists what is in range, asks which
-    network and takes the passphrase with the characters masked.</p>
-    <p>set <code>A_DISK=/dev/sdX</code> and that one command partitions,
-    formats, mounts, installs and wires up the bootloader. or set
-    <code>A_ROOT_PART</code>/<code>A_BOOT_PART</code> to use partitions you
-    made yourself, formatted or not. the config is checked before anything is
-    written — it either says <code>Config file accepted</code> with a summary,
-    or lists everything that is wrong and stops having changed nothing.
-    <code>arctic-install</code> takes no arguments; the disk is in the config.
-    full walkthrough in the <a href="https://arctic-docs.apiwow.net">docs</a>.</p>
+    <h3>1. Partition and format</h3>
+    <p>By hand. Root plus a FAT32 boot partition for UEFI/Limine; root
+    plus a small unformatted BIOS-boot partition for BIOS/GRUB or BIOS/Limine.</p>
+    <pre class="code">fdisk /dev/sdX
+mkfs.ext4 /dev/sdX2
+mount /dev/sdX2 /mnt
+mkfs.fat -F32 /dev/sdX1
+mount --mkdir /dev/sdX1 /mnt/boot</pre>
+
+    <h3>2. Extract the tarball</h3>
+    <p><code>def</code> for busybox init, <code>openrc</code> for
+    OpenRC. Either way <code>alpm</code> arrives pre-installed.</p>
+    <pre class="code">tar -xJf arctic-linux-def-tarball.tar.xz -C /mnt</pre>
+
+    <h3>3. Bootstrap alpm and fstab</h3>
+    <p><code>alpm-strap</code> syncs fresh repo indexes into the tree.
+    <code>genfstab</code> has to run before chroot, from outside it.</p>
+    <pre class="code">/mnt/usr/bin/alpm-strap /mnt
+ALPM_ROOT=/mnt ALPM_CONF=/mnt/etc/alpm/alpm.conf ALPM_REPOD=/mnt/etc/alpm/repos.d \
+  /mnt/usr/bin/alpm add genfstab
+/mnt/usr/bin/genfstab /mnt >> /mnt/etc/fstab</pre>
+
+    <h3>4. Chroot in and install the rest</h3>
+    <p>Swap <code>limine</code> for <code>grub</code> on BIOS if you
+    want GRUB instead.</p>
+    <pre class="code">/mnt/usr/bin/arctic-chroot /mnt</pre>
+    <pre class="code">passwd
+adduser you
+alpm add arctic-base
+alpm add arctic-base-kernel
+alpm add limine
+arctic-mkinitramfs
+exit</pre>
+
+    <h3>5. Finish and deploy the bootloader</h3>
+    <p>Back on the live environment, as root. This writes the bootloader
+    config; the actual deploy command stays manual.</p>
+    <pre class="code">arctic-rebuild</pre>
+    <pre class="code"><span class="c"># BIOS, Limine</span>
+limine bios-install /dev/sdX
+
+<span class="c"># EFI, Limine</span>
+efibootmgr --create --disk /dev/sdX --part 1 \
+  --loader '\EFI\arctic\arcticx64.efi' --label 'Arctic linux'
+
+<span class="c"># BIOS, GRUB</span>
+grub-install --target=i386-pc --boot-directory=/mnt/boot /dev/sdX</pre>
+
+    <h3>6. Reboot</h3>
+    <pre class="code">reboot</pre>
+
+    <p>Encryption, btrfs, static networking, repairs: the
+    <a href="https://arctic-docs.apiwow.net/install.html">install docs</a>.</p>
   </section>
 
   <section>
     <h2>build it yourself</h2>
-    <p>every build runs sandboxed under bubblewrap — the host is mounted
-    read-only, only the build tree and /tmp are writable. that is not a
-    formality: a recipe that forgets DESTDIR once installed glibc straight
-    over a host's /usr/lib. it now just fails with EROFS instead.</p>
+    <p>Every build runs sandboxed under bubblewrap - the host is mounted
+    read-only, only the build tree and /tmp are writable.</p>
     <pre class="code">build/arctic-sandbox --check
 build/build.sh</pre>
-    <p>the toolchain is clang, lld and the llvm-* binutils. there is no
-    second one: a package built by gcc is not an Arctic package, and
-    <code>alpm build</code> refuses to produce one unless it is told, loudly,
-    that you know what you are doing.</p>
-    <p>llvm is a package now, so an installed machine has a compiler of its
-    own and <code>alpm add -s</code> works on it. at 148 MiB it is far past
-    what a git mirror will hold, so it arrives the same way firmware does —
-    a release asset, indexed by the <code>big</code> repository, installed
-    like anything else.</p>
-    <p>be straight about where this has got to: the packages in the current
-    image were still compiled by gcc. llvm being packaged is what makes the
-    rebuild possible, not the rebuild itself.</p>
+    <p>The toolchain is clang, lld and the llvm-* binutils. There is no
+    second one: a package built by gcc is not an Arctic package.</p>
   </section>
 
   <section>
     <h2>contribute</h2>
-    <p>530+ packages are defined in a manifest in
-    <a href="https://github.com/apiwo/arctic-linux-ports">arctic-linux-ports</a>, with
-    recipes generated from it rather than hand-written. adding a port means
-    adding a line to the manifest, not boilerplate. getting a package that
-    assumes gcc to build under clang is one of the easiest ways to help
-    right now.</p>
-    <p>pull requests welcome on <a href="https://github.com/apiwo/arctic-linux">github</a>.</p>
+    <p>Packages are defined in a manifest in
+    <a href="https://github.com/apiwo/arctic-linux-ports">arctic-linux-ports</a>,
+    with recipes generated from it rather than hand-written. Adding a
+    port means adding a line to the manifest, not boilerplate.</p>
+    <p>Pull requests welcome on <a href="https://github.com/apiwo/arctic-linux">github</a>.</p>
   </section>
 
   <section>
-    <div class="download">
-      <a class="btn-download"
-         href="https://github.com/apiwo/arctic-linux/releases/download/A1/Arctic-linux-A1.iso">Download Arctic Linux</a>
-      <div class="meta">
-        A1 &middot; x86_64 &middot; 696 MiB &middot; live image and installer<br>
-        <code>dd if=Arctic-linux-A1.iso of=/dev/sdX bs=4M status=progress conv=fsync</code>
-      </div>
-    </div>
+    <h2>download</h2>
+    <p><a href="https://github.com/apiwo/arctic-linux/releases/latest">Latest release on GitHub</a>
+    - <code>arctic-linux-def-tarball.tar.xz</code> and
+    <code>arctic-linux-openrc-tarball.tar.xz</code>, both with a
+    <code>.sha256</code> alongside.</p>
   </section>
 
   <footer>
-    arctic's own code is BSD-2-Clause. packaged software keeps its own licence.
+    Arctic's own code is BSD-2-Clause. Packaged software keeps its own license.
   </footer>
 
 </div>
